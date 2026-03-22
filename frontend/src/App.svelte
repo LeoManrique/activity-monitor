@@ -1,50 +1,36 @@
 <script>
-import {Events} from "@wailsio/runtime";
-import {GreetService} from "../bindings/github.com/LeoManrique/activity-monitor";
-let name = '';
-let result = 'Please enter your name below 👇';
-let time = 'Listening for Time event...';
+  import { onMount } from "svelte";
+  import { GetMemoryUsage } from "../bindings/github.com/LeoManrique/activity-monitor/memoryservice";
 
-const doGreet = () => {
-  let localName = name;
-  if (!localName) {
-    localName = 'anonymous';
-  }
-  GreetService.Greet(localName).then((resultValue) => {
-    result = resultValue;
-  }).catch((err) => {
-    console.log(err);
+  let groups = [];
+
+  onMount(async () => {
+    try {
+      groups = await GetMemoryUsage();
+    } catch (err) {
+      console.error("Failed to fetch memory usage:", err);
+    }
   });
-}
-
-Events.On('time', (timeValue) => {
-  time = timeValue.data;
-});
 </script>
 
-<div class="container">
-  <div>
-    <span data-wml-openURL="https://wails.io">
-      <img src="/wails.png" class="logo" alt="Wails logo"/>
-    </span>
-    <span data-wml-openURL="https://svelte.dev">
-      <img src="/svelte.svg" class="logo svelte" alt="Svelte logo"/>
-    </span>
-  </div>
-  <h1>Wails + Svelte</h1>
-  <div aria-label="result" class="result">{result}</div>
-  <div class="card">
-    <div class="input-box">
-      <input aria-label="input" class="input" bind:value={name} type="text" autocomplete="off"/>
-      <button aria-label="greet-btn" class="btn" on:click={doGreet}>Greet</button>
-    </div>
-  </div>
-  <div class="footer">
-    <div><p>Click on the Wails logo to learn more</p></div>
-    <div><p>{time}</p></div>
-  </div>
-</div>
-
-<style>
-  /* Put your standard CSS here */
-</style>
+<main>
+  <h1>Memory Usage</h1>
+  <table>
+    <thead>
+    <tr>
+      <th>Application</th>
+      <th>Memory (KB)</th>
+      <th>Processes</th>
+    </tr>
+    </thead>
+    <tbody>
+    {#each groups as group}
+      <tr>
+        <td>{group.name}</td>
+        <td>{group.memoryKB}</td>
+        <td>{group.processCount}</td>
+      </tr>
+    {/each}
+    </tbody>
+  </table>
+</main>

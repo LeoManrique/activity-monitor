@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	_ "embed"
+	"fmt"
 	"log"
 	"time"
 
@@ -29,16 +30,27 @@ func init() {
 // logs any error that might occur.
 func main() {
 
+	list, err2 := getProcessList()
+
+	if err2 != nil {
+		log.Fatal("something went wrong")
+	}
+	result := parseAllProcesses(list)
+
+	for _, v := range result[:10] {
+		fmt.Printf("%v\n", v)
+	}
+
 	// Create a new Wails application by providing the necessary options.
 	// Variables 'Name' and 'Description' are for application metadata.
 	// 'Assets' configures the asset server with the 'FS' variable pointing to the frontend files.
-	// 'Bind' is a list of Go struct instances. The frontend has access to the methods of these instances.
+	// 'Bind' is a processList of Go struct instances. The frontend has access to the methods of these instances.
 	// 'Mac' options tailor the application when running an macOS.
 	app := application.New(application.Options{
 		Name:        "activity-monitor",
 		Description: "A demo of using raw HTML & CSS",
 		Services: []application.Service{
-			application.NewService(&GreetService{}),
+			application.NewService(&MemoryService{}),
 		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
