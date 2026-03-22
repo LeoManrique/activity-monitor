@@ -1,7 +1,6 @@
 <script>
 import {Events} from "@wailsio/runtime";
-import {GreetService} from "../bindings/changeme";
-
+import {GreetService} from "../bindings/github.com/LeoManrique/activity-monitor";
 let name = '';
 let result = 'Please enter your name below 👇';
 let time = 'Listening for Time event...';
